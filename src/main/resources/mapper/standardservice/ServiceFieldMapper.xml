@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yss.datamiddle.mapper.standardservice.ServiceFieldMapper">
+
+	<resultMap type="com.yss.datamiddle.vo.standardservice.ServiceFieldDO" id="BeanResultMap">
+		<id property="id" column="fid" />
+		<result property="serviceId" column="fservice_id" />
+		<result property="name" column="fname" />
+		<result property="innerName" column="finner_name" />
+		<result property="type" column="ftype" />
+		<result property="alias" column="falias" />
+	</resultMap>
+	<sql id="selectSql">
+		SELECT FID,FSERVICE_ID,FNAME,FINNER_NAME,FTYPE,FALIAS FROM
+		t_bi_service_field
+	</sql>
+	<select id="selectList" resultMap="BeanResultMap">
+		<include refid="selectSql" />
+		WHERE FSERVICE_ID = #{serviceId}
+		ORDER BY FID
+	</select>
+	<insert id="insert" parameterType="com.yss.datamiddle.vo.standardservice.ServiceFieldDO">
+		INSERT INTO t_bi_service_field
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="serviceId != null  and serviceId != ''  ">FSERVICE_ID,</if>
+			<if test="name != null  and name != ''  ">FNAME,</if>
+			<if test="innerName != null  and innerName != ''  ">FINNER_NAME,</if>
+			<if test="type != null  and type != ''  ">FTYPE,</if>
+			<if test="alias != null  and alias != ''  ">FALIAS,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="serviceId != null  and serviceId != ''  ">#{serviceId},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="innerName != null  and innerName != ''  ">#{innerName},</if>
+			<if test="type != null  and type != ''  ">#{type},</if>
+			<if test="alias != null  and alias != ''  ">#{alias},</if>
+		</trim>
+	</insert>
+	<!-- <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="false"> 
+		INSERT INTO T_BI_SERVICE_FIELD(FID,FSERVICE_ID,FNAME,FINNER_NAME,FTYPE,FALIAS) 
+		VALUES <foreach collection="list" item="item" index="index" separator=","> 
+		(#{item.id}, #{item.serviceId}, #{item.name}, #{item.innerName}, #{item.type}, 
+		#{item.alias} ) </foreach> </insert> -->
+	<update id="update" parameterType="com.yss.datamiddle.vo.standardservice.ServiceFieldDO">
+		UPDATE t_bi_service_field
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID=#{id},</if>
+			<if test="serviceId != null  and serviceId != ''  ">FSERVICE_ID=#{serviceId},</if>
+			<if test="name != null  and name != ''  ">FNAME=#{name},</if>
+			<if test="innerName != null  and innerName != ''  ">FINNER_NAME=#{innerName},</if>
+			<if test="type != null  and type != ''  ">FTYPE=#{type},</if>
+			<if test="alias != null  and alias != ''  ">FALIAS=#{alias},</if>
+		</trim>
+		WHERE FID = #{id}
+	</update>
+	<delete id="delete" parameterType="String">
+		DELETE FROM t_bi_service_field WHERE FID IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+	<delete id="deleteByServiceId" parameterType="String">
+		DELETE FROM t_bi_service_field WHERE FSERVICE_ID IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

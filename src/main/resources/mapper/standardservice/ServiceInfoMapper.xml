@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yss.datamiddle.mapper.standardservice.ServiceInfoMapper">
+
+	<resultMap type="com.yss.datamiddle.vo.standardservice.ServiceInfoDO" id="BeanResultMap">
+		<id property="id" column="fid" />
+		<result property="code" column="fcode" />
+		<result property="version" column="fversion" />
+		<result property="name" column="fname" />
+		<result property="desc" column="fdesc" />
+		<result property="type" column="ftype" />
+		<result property="relId" column="frel_id" /> 
+		<result property="creatorId" column="fcreator_id" />
+		<result property="createTime" column="fcreate_time" />
+		<result property="lastEditorId" column="flast_editor_id" />
+		<result property="lastEditTime" column="flast_edit_time" />
+		<result property="checkState" column="fcheck_state" />
+		<result property="checkerId" column="fchecker_id" />
+		<result property="checkTime" column="fcheck_time" />
+		<result property="userName" column="user_name" />
+	</resultMap>
+	<resultMap type="com.yss.datamiddle.vo.standardservice.ServiceInfoVO" id="VOBeanResultMap"
+		extends="BeanResultMap">
+		<result property="datamartId" column="FDATAMART_ID" />
+	</resultMap>
+	<resultMap type="com.yss.datamiddle.vo.standardservice.InnerServiceInfoDO" id="BeanResultMap2">
+		<id property="id" column="fid" />
+		<result property="code" column="fcode" />
+		<result property="version" column="fversion" />
+		<result property="alias" column="falias" />
+		<result property="type" column="ftype" />
+	</resultMap>
+	<sql id="selectSql">
+		SELECT
+		TSERV.FID,TSERV.FCODE,TSERV.FVERSION,TSERV.FNAME,TSERV.FDESC,TSERV.FTYPE,TSERV.FREL_ID,
+		TSERV.FCREATOR_ID,TSERV.FCREATE_TIME,TSERV.FLAST_EDITOR_ID,TSERV.FLAST_EDIT_TIME,TSERV.FCHECK_STATE,
+		TSERV.FCHECKER_ID,TSERV.FCHECK_TIME,TUSER.USER_NAME
+		FROM t_bi_service
+		TSERV LEFT JOIN t_bi_user TUSER ON TSERV.FCREATOR_ID
+		= TUSER.USER_ID
+	</sql>
+	<select id="select" resultMap="VOBeanResultMap">
+		SELECT
+		TSERV.FID,TSERV.FCODE,TSERV.FVERSION,TSERV.FNAME,TSERV.FDESC,TSERV.FTYPE,TSERV.FREL_ID,TSERV.FCREATOR_ID,
+		TSERV.FCREATE_TIME,TSERV.FLAST_EDITOR_ID,TSERV.FLAST_EDIT_TIME,TSERV.FCHECK_STATE,TSERV.FCHECKER_ID,TSERV.FCHECK_TIME,
+		TUSER.USER_NAME,dmr.FDATAMART_ID
+		FROM t_bi_service TSERV LEFT JOIN
+		t_bi_user TUSER ON TSERV.FCREATOR_ID
+		=
+		TUSER.USER_ID
+		LEFT JOIN
+		t_bi_datamart_catalog_re dmr ON TSERV.FID =
+		dmr.FREL_ID and
+		dmr.FDATA_TYPE=2
+		WHERE TSERV.FID=#{id}
+	</select>
+	<select id="selectList" parameterType="com.yss.datamiddle.vo.standardservice.ServicePageVO"
+		resultMap="VOBeanResultMap">
+		<include refid="selectSql" />
+		<where>
+			<if test="dataIds != null and dataIds.size == 0 ">
+				AND 1=2
+			</if>
+			<if test="dataIds != null and dataIds.size > 0 ">
+				AND FID IN
+				<foreach item="item" index="index" collection="dataIds"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="param.keyWord != null and param.keyWord != '' ">
+				and (upper(fcode) like '%${param.keyWord}%' or
+				upper(fname) like '%${param.keyWord}%')
+			</if>
+			<if test="param.path != null and param.path !='' ">
+				AND TSERV.FID IN (SELECT FREL_ID FROM
+				t_bi_datamart_catalog_re
+				WHERE FDATA_TYPE='2' AND FDATAMART_ID IN
+				(SELECT FID FROM
+				t_bi_datamart_catalog WHERE FPATH LIKE
+				'${param.path}%'))
+			</if>
+		</where>
+		ORDER BY FCREATE_TIME DESC
+	</select>
+	<insert id="insert" parameterType="com.yss.datamiddle.vo.standardservice.ServiceInfoDO">
+		INSERT INTO t_bi_service
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="code != null  and code != ''  ">FCODE,</if>
+			<if test="version != null  and version != ''  ">FVERSION,</if>
+			<if test="name != null  and name != ''  ">FNAME,</if>
+			<if test="desc != null  and desc != ''  ">FDESC,</if>
+			<if test="type != null  and type != ''  ">FTYPE,</if>
+			<if test="relId != null  and relId != ''  ">FREL_ID,</if>
+			<if test="creatorId != null  and creatorId != ''  ">FCREATOR_ID,</if>
+			<if test="createTime != null  and createTime != ''  ">FCREATE_TIME,</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">FLAST_EDITOR_ID,</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">FLAST_EDIT_TIME,</if>
+			<if test="checkState != null  and checkState != ''  ">FCHECK_STATE,</if>
+			<if test="checkerId != null  and checkerId != ''  ">FCHECKER_ID,</if>
+			<if test="checkTime != null  and checkTime != ''  ">FCHECK_TIME,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="code != null  and code != ''  ">#{code},</if>
+			<if test="version != null  and version != ''  ">#{version},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="desc != null  and desc != ''  ">#{desc},</if>
+			<if test="type != null  and type != ''  ">#{type},</if>
+			<if test="relId != null  and relId != ''  ">#{relId},</if>
+			<if test="creatorId != null  and creatorId != ''  ">#{creatorId},</if>
+			<if test="createTime != null  and createTime != ''  ">#{createTime},</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">#{lastEditorId},</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">#{lastEditTime},</if>
+			<if test="checkState != null  and checkState != ''  ">#{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">#{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">#{checkTime},</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.yss.datamiddle.vo.standardservice.ServiceInfoDO">
+		UPDATE t_bi_service
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID = #{id},</if>
+			<if test="code != null  and code != ''  ">FCODE = #{code},</if>
+			<if test="version != null  and version != ''  ">FVERSION = #{version},</if>
+			<if test="name != null  and name != ''  ">FNAME = #{name},</if>
+			<if test="desc != null  and desc != ''  ">FDESC = #{desc},</if>
+			<if test="type != null  and type != ''  ">FTYPE = #{type},</if>
+			<if test="relId != null  and relId != ''  ">FREL_ID = #{relId},</if> 
+			<if test="creatorId != null  and creatorId != ''  ">FCREATOR_ID = #{creatorId},</if>
+			<if test="createTime != null  and createTime != ''  ">FCREATE_TIME = #{createTime},</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">FLAST_EDITOR_ID = #{lastEditorId},</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">FLAST_EDIT_TIME = #{lastEditTime},</if>
+			<if test="checkState != null  and checkState != ''  ">FCHECK_STATE = #{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">FCHECKER_ID = #{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">FCHECK_TIME = #{checkTime},</if>
+		</trim>
+		WHERE FID = #{id}
+	</update>
+	<update id="updateCheckState">
+		UPDATE t_bi_service SET
+		FCHECK_STATE=#{checkState},FCHECKER_ID=#{checkerId},FCHECK_TIME=#{checkTime}
+		WHERE FID IN
+		<foreach item="id" collection="ids" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</update>
+	<delete id="delete" parameterType="String">
+		DELETE FROM t_bi_service WHERE FID IN
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+	<!-- 内部服务信息查询 -->
+	<select id="selectInnerDmService" resultMap="BeanResultMap2">
+		SELECT
+		FID,FCODE,FVERSION,FNAME FALIAS,0 FTYPE FROM t_bi_datamodel WHERE
+		FCHECK_STATE='1'
+	</select>
+	<select id="selectInnerViewService" resultMap="BeanResultMap2">
+		SELECT FID,FNAME
+		FCODE,NULL FVERSION,FVIEW_ALIAS FALIAS,1 FTYPE FROM t_bi_tableview
+		WHERE FCHECK_STATE='1'
+	</select>
+	<!-- 外部服务调用查询 -->
+	<select id="selectByCodeVersion" resultMap="BeanResultMap">
+		<include refid="selectSql" />
+		<where>
+			AND TSERV.FCODE = #{code}
+			<if test="version != null  and version != ''  ">
+				AND TSERV.FVERSION = #{version}
+			</if>
+			<if test="version == null or version == ''  ">
+				AND TSERV.FVERSION IS NULL
+			</if>
+		</where>
+	</select>
+	<select id="existCodeVersion" resultType="java.lang.Boolean">
+		SELECT COUNT(1) FROM t_bi_service TSERV
+		<where>
+			AND upper(TSERV.FCODE) = upper(#{code})
+			<if test="version != null  and version != ''  ">
+				AND upper(TSERV.FVERSION) = upper(#{version})
+			</if>
+			<if test="version == null or version == ''  ">
+				AND TSERV.FVERSION IS NULL
+			</if>
+		</where>
+	</select>
+	<select id="existNameVersion" resultType="java.lang.Boolean">
+		SELECT COUNT(1) FROM t_bi_service TSERV
+		<where>
+			AND upper(TSERV.FNAME) = upper(#{name})
+			<if test="version != null  and version != ''  ">
+				AND upper(TSERV.FVERSION) = upper(#{version})
+			</if>
+			<if test="version == null or version == ''  ">
+				AND TSERV.FVERSION IS NULL
+			</if>
+		</where>
+	</select>
+	<select id="existReference" resultType="java.lang.Boolean">
+		SELECT COUNT(1) FROM t_bi_service
+		<where>
+			AND fcheck_state='1'
+			AND ftype = #{type}
+			<if test="relIds != null and relIds.size > 0 ">
+				AND frel_id IN
+				<foreach item="item" index="index" collection="relIds"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+</mapper>

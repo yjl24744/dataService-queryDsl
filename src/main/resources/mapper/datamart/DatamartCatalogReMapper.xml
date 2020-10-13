@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yss.datamiddle.mapper.datamart.DatamartCatalogReMapper">
+
+	<resultMap type="com.yss.datamiddle.vo.datamart.DatamartCatalogRe"
+		id="DatamartCatalogReResult">
+		<result property="id" column="FID" />
+		<result property="datamartId" column="FDATAMART_ID" />
+		<result property="dataType" column="FDATA_TYPE" />
+		<result property="relId" column="FREL_ID" />
+	</resultMap>
+
+	<sql id="selectDatamartCatalogReVo">
+		SELECT FID, FDATAMART_ID, FDATA_TYPE, FREL_ID FROM
+		t_bi_datamart_catalog_re
+	</sql>
+
+	<select id="selectDatamartCatalogRe"
+		parameterType="com.yss.datamiddle.vo.datamart.DatamartCatalogRe" resultMap="DatamartCatalogReResult">
+		<include refid="selectDatamartCatalogReVo" />
+		WHERE 1=1
+		<if test="id != null  and id != ''  "> AND FID=#{id}</if>
+		<if test="datamartId != null  and datamartId != ''  "> AND FDATAMART_ID=#{datamartId}</if>
+		<if test="dataType != null  and dataType != ''  "> AND FDATA_TYPE=#{dataType}</if>
+		<if test="relId != null  and relId != ''  "> AND FREL_ID=#{relId}</if>
+	</select>
+
+	<insert id="insertDatamartCatalogRe"
+		parameterType="com.yss.datamiddle.vo.datamart.DatamartCatalogRe">
+		INSERT INTO t_bi_datamart_catalog_re
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="datamartId != null  and datamartId != ''  ">FDATAMART_ID,</if>
+			<if test="dataType != null  and dataType != ''  ">FDATA_TYPE,</if>
+			<if test="relId != null  and relId != ''  ">FREL_ID,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="datamartId != null  and datamartId != ''  ">#{datamartId},</if>
+			<if test="dataType != null  and dataType != ''  ">#{dataType},</if>
+			<if test="relId != null  and relId != ''  ">#{relId},</if>
+		</trim>
+	</insert>
+
+	<insert id="insertDatamartCatalogReByList"
+		parameterType="java.util.ArrayList">
+		insert into
+		t_bi_datamart_catalog_re(FID,FDATAMART_ID,FDATA_TYPE,FREL_ID) values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id},#{item.datamartId},#{item.dataType},#{item.relId})
+		</foreach>
+	</insert>
+
+	<update id="updateDatamartCatalogRe"
+		parameterType="com.yss.datamiddle.vo.datamart.DatamartCatalogRe">
+		UPDATE t_bi_datamart_catalog_re
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="datamartId != null  and datamartId != ''  ">FDATAMART_ID=#{datamartId},</if>
+			<if test="dataType != null  and dataType != ''  ">FDATA_TYPE=#{dataType},</if>
+			<if test="relId != null  and relId != ''  ">FREL_ID=#{relId},</if>
+		</trim>
+		WHERE FID = #{id}
+	</update>
+
+	<!--<update id="updateDatamartCatalogReByRelId"-->
+		<!--parameterType="DatamartCatalogRe">-->
+		<!--UPDATE T_BI_DATAMART_CATALOG_RE-->
+		<!--<trim prefix="SET" suffixOverrides=",">-->
+			<!--<if test="datamartId != null  and datamartId != ''  ">FDATAMART_ID=#{datamartId},</if>-->
+		<!--</trim>-->
+		<!--WHERE FREL_ID = #{relId}-->
+	<!--</update>-->
+
+	<delete id="deleteDataModelReByRelids">
+		DELETE
+		FROM
+		t_bi_datamart_catalog_re WHERE FDATA_TYPE =#{dataType} AND
+		FREL_ID IN
+		<foreach item="item" collection="relIds" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+	<!-- <delete id="deleteDataModelDmReByRelids" parameterType="java.util.List"> 
+		DELETE FROM T_BI_DATAMART_CATALOG_RE WHERE FDATA_TYPE =0 AND FREL_ID IN <foreach 
+		item="item" collection="array" open="(" separator="," close=")"> #{item} 
+		</foreach> </delete> <delete id="deleteTableViewDmReByRelids" parameterType="String"> 
+		DELETE FROM T_BI_DATAMART_CATALOG_RE WHERE FDATA_TYPE =1 AND FREL_ID IN <foreach 
+		item="item" collection="array" open="(" separator="," close=")"> #{item} 
+		</foreach> </delete> -->
+</mapper>

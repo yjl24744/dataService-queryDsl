@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.datamiddle.mapper.datamodel.EtlConfigMapper">
+    
+    <resultMap type="com.yss.datamiddle.vo.datamodel.EtlConfig" id="EtlConfigResult">
+        <result property="id"    column="FID"    />
+        <result property="datamodelId"    column="FDATAMODEL_ID"    />
+        <result property="srcDsId"    column="FSRC_DS_ID"    />
+        <result property="tarDsId"    column="FTAR_DS_ID"    />
+        <result property="tableName"    column="FTABLE_NAME"    />
+        <result property="newTableName"    column="FNEW_TABLE_NAME"    />
+        <result property="extractType"    column="FEXTRACT_TYPE"    />
+        <result property="cycle"    column="FCYCLE"    />
+        <result property="interval"    column="FINTERVAL"    />
+        <result property="extractTime"    column="FEXTRACT_TIME"    />
+        <result property="beginTime"    column="FBEGIN_TIME"    />
+        <result property="endTime"    column="FEND_TIME"    />
+        <result property="taskId"	column="FTASK_ID" />
+        <result property="templetCode"	column="FTEMPLET_CODE" />
+    </resultMap>
+	
+	<sql id="selectEtlConfigVo">
+        select FID, FDATAMODEL_ID, FSRC_DS_ID, FTAR_DS_ID, FTABLE_NAME, FEXTRACT_TYPE, FCYCLE, FINTERVAL, FEXTRACT_TIME, FBEGIN_TIME, FEND_TIME, FTASK_ID, FNEW_TABLE_NAME, FTEMPLET_CODE from t_bi_etl_config
+    </sql>
+	
+    <select id="selectEtlConfigList" parameterType="com.yss.datamiddle.vo.datamodel.EtlConfig" resultMap="EtlConfigResult">
+        <include refid="selectEtlConfigVo"/>
+        <where>  
+            <if test="id != null  and id != '' "> and FID = #{id}</if>
+             <if test="datamodelId != null  and datamodelId != '' "> and FDATAMODEL_ID = #{datamodelId}</if>
+             <if test="srcDsId != null  and srcDsId != '' "> and FSRC_DS_ID = #{srcDsId}</if>
+             <if test="tarDsId != null  and tarDsId != '' "> and FTAR_DS_ID = #{tarDsId}</if>
+             <if test="tableName != null  and tableName != '' "> and FTABLE_NAME = #{tableName}</if>
+             <if test="extractType != null  and extractType != '' "> and FEXTRACT_TYPE = #{extractType}</if>
+             <if test="cycle != null  and cycle != '' "> and FCYCLE = #{cycle}</if>
+             <if test="interval != null "> and FINTERVAL = #{interval}</if>
+             <if test="extractTime != null  and extractTime != '' "> and FEXTRACT_TIME = #{extractTime}</if>
+             <if test="beginTime != null  and beginTime != '' "> and FBEGIN_TIME = #{beginTime}</if>
+             <if test="endTime != null  and endTime != '' "> and FEND_TIME = #{endTime}</if>
+             <if test="taskId != null  and taskId != '' "> and FTASK_ID = #{taskId}</if>
+             <if test="newTableName != null  and newTableName != '' "> and FNEW_TABLE_NAME = #{newTableName}</if>
+             <if test="templetCode != null  and templetCode != '' "> and FTEMPLET_CODE = #{templetCode}</if>
+         </where>
+    </select>
+    
+    <select id="selectEtlConfigById" parameterType="String" resultMap="EtlConfigResult">
+        <include refid="selectEtlConfigVo"/>
+        where FID = #{id}
+    </select>
+        
+    <insert id="insertEtlConfig" parameterType="com.yss.datamiddle.vo.datamodel.EtlConfig">
+        insert into t_bi_etl_config
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="datamodelId != null  and datamodelId != ''  ">FDATAMODEL_ID,</if>
+			<if test="srcDsId != null  and srcDsId != ''  ">FSRC_DS_ID,</if>
+			<if test="tarDsId != null  and tarDsId != ''  ">FTAR_DS_ID,</if>
+			<if test="tableName != null  and tableName != ''  ">FTABLE_NAME,</if>
+			<if test="extractType != null  and extractType != ''  ">FEXTRACT_TYPE,</if>
+			<if test="cycle != null  and cycle != ''  ">FCYCLE,</if>
+			<if test="interval != null  ">FINTERVAL,</if>
+			<if test="extractTime != null  and extractTime != ''  ">FEXTRACT_TIME,</if>
+			<if test="beginTime != null  and beginTime != ''  ">FBEGIN_TIME,</if>
+			<if test="endTime != null  and endTime != ''  ">FEND_TIME,</if>
+			<if test="taskId != null  and taskId != ''  ">FTASK_ID,</if>
+			<if test="newTableName != null  and newTableName != '' ">FNEW_TABLE_NAME,</if>
+            <if test="templetCode != null  and templetCode != '' ">FTEMPLET_CODE,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="datamodelId != null  and datamodelId != ''  ">#{datamodelId},</if>
+			<if test="srcDsId != null  and srcDsId != ''  ">#{srcDsId},</if>
+			<if test="tarDsId != null  and tarDsId != ''  ">#{tarDsId},</if>
+			<if test="tableName != null  and tableName != ''  ">#{tableName},</if>
+			<if test="extractType != null  and extractType != ''  ">#{extractType},</if>
+			<if test="cycle != null  and cycle != ''  ">#{cycle},</if>
+			<if test="interval != null  ">#{interval},</if>
+			<if test="extractTime != null  and extractTime != ''  ">#{extractTime},</if>
+			<if test="beginTime != null  and beginTime != ''  ">#{beginTime},</if>
+			<if test="endTime != null  and endTime != ''  ">#{endTime},</if>
+			<if test="taskId != null  and taskId != ''  ">#{taskId},</if>
+			<if test="newTableName != null  and newTableName != '' ">#{newTableName},</if>
+            <if test="templetCode != null  and templetCode != '' ">#{templetCode},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateEtlConfig" parameterType="com.yss.datamiddle.vo.datamodel.EtlConfig">
+        update t_bi_etl_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="datamodelId != null  and datamodelId != ''  ">FDATAMODEL_ID = #{datamodelId},</if>
+            <if test="srcDsId != null  and srcDsId != ''  ">FSRC_DS_ID = #{srcDsId},</if>
+            <if test="tarDsId != null  and tarDsId != ''  ">FTAR_DS_ID = #{tarDsId},</if>
+            <if test="tableName != null  and tableName != ''  ">FTABLE_NAME = #{tableName},</if>
+            <if test="extractType != null  and extractType != ''  ">FEXTRACT_TYPE = #{extractType},</if>
+            <if test="cycle != null  and cycle != ''  ">FCYCLE = #{cycle},</if>
+            <if test="interval != null  ">FINTERVAL = #{interval},</if>
+            <if test="extractTime != null  and extractTime != ''  ">FEXTRACT_TIME = #{extractTime},</if>
+            <if test="beginTime != null  and beginTime != ''  ">FBEGIN_TIME = #{beginTime},</if>
+            <if test="endTime != null  and endTime != ''  ">FEND_TIME = #{endTime},</if>
+            <if test="taskId != null  and taskId != '' ">FTASK_ID = #{taskId},</if>
+            <if test="newTableName != null  and newTableName != '' ">FNEW_TABLE_NAME = #{newTableName},</if>
+            <if test="templetCode != null  and templetCode != '' ">FTEMPLET_CODE = #{templetCode},</if>
+        </trim>
+        where FID = #{id}
+    </update>
+
+	<delete id="deleteEtlConfigById" parameterType="String">
+        delete from t_bi_etl_config where FID = #{id}
+    </delete>
+	
+    <delete id="deleteEtlConfigByIds" parameterType="String">
+        delete from t_bi_etl_config where FID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+     <select id="selectEtlConfigsByDmIdSrcDsIdTName" resultMap="EtlConfigResult">
+        <include refid="selectEtlConfigVo"/>
+         where 1=1
+             <if test="datamodelId != null  and datamodelId != '' "> and FDATAMODEL_ID = #{datamodelId}</if>
+             <if test="srcDsId != null  and srcDsId != '' "> and FSRC_DS_ID = #{srcDsId}</if>
+             <if test="tableName != null  and tableName != '' "> and FTABLE_NAME = #{tableName}</if>
+    </select>
+    
+    <delete id="deleteEtlConfigsByNewTableName" parameterType="String">
+        delete from t_bi_etl_config where FNEW_TABLE_NAME = #{newTableName}
+    </delete>
+    
+</mapper>

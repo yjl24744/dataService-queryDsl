@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.datamiddle.mapper.datamodel.FieldMapper">
+    
+    <resultMap type="com.yss.datamiddle.vo.datamodel.BiField" id="FieldResult">
+        <result property="id"    column="FID"    />
+        <result property="tableId"    column="FTABLE_ID"    />
+        <result property="fieldName"    column="FFIELD_NAME"    />
+        <result property="fieldAlias"    column="FFIELD_ALIAS"    />
+        <result property="fieldType"    column="FFIELD_TYPE"    />
+        <result property="length"    column="FLENGTH"    />
+        <result property="scale"    column="FSCALE"    />
+        <result property="publicDim"    column="FPUBLIC_DIM"    />
+        <result property="flag"    column="FLAG"    />
+        <result property="showFlag"    column="FSHOW_FLAG"    />
+        <result property="srcField"    column="FSRC_FIELD"    />
+        <result property="groupName"    column="FGROUP_NAME"    />
+    </resultMap>
+	
+	<sql id="selectFieldVo">
+        select FID, FTABLE_ID, FFIELD_NAME, FFIELD_ALIAS, FFIELD_TYPE, FLENGTH, FSCALE, FPUBLIC_DIM, FLAG, FSHOW_FLAG, FSRC_FIELD, FGROUP_NAME from t_bi_field
+    </sql>
+	
+    <select id="selectFieldList" parameterType="com.yss.datamiddle.vo.datamodel.BiField" resultMap="FieldResult">
+        <include refid="selectFieldVo"/>
+        <where>  
+            <if test="id != null  and id != '' "> and FID = #{id}</if>
+             <if test="tableId != null  and tableId != '' "> and FTABLE_ID = #{tableId}</if>
+             <if test="fieldName != null  and fieldName != '' "> and FFIELD_NAME = #{fieldName}</if>
+             <if test="fieldAlias != null  and fieldAlias != '' "> and FFIELD_ALIAS = #{fieldAlias}</if>
+             <if test="publicDim != null  and publicDim != '' "> and FPUBLIC_DIM = #{publicDim}</if>
+             <if test="flag != null  and flag != '' "> and FLAG = #{flag}</if>
+             <if test="showFlag != null  and showFlag != '' "> and FSHOW_FLAG = #{showFlag}</if>
+             <if test="srcField != null  and srcField != '' "> and FSRC_FIELD = #{srcField}</if>
+             <if test="groupName != null  and groupName != '' "> and FGROUP_NAME = #{groupName}</if>
+         </where>
+    </select>
+    
+    <select id="selectFieldById" parameterType="String" resultMap="FieldResult">
+        <include refid="selectFieldVo"/>
+        where FID = #{id}
+    </select>
+        
+    <insert id="insertField" parameterType="com.yss.datamiddle.vo.datamodel.BiField">
+        insert into t_bi_field
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="tableId != null  and tableId != ''  ">FTABLE_ID,</if>
+			<if test="fieldName != null  and fieldName != ''  ">FFIELD_NAME,</if>
+			<if test="fieldAlias != null  and fieldAlias != ''  ">FFIELD_ALIAS,</if>
+			<if test="fieldType != null  and fieldType != ''  ">FFIELD_TYPE,</if>
+			<if test="length != null  ">FLENGTH,</if>
+			<if test="scale != null  ">FSCALE,</if>
+			<if test="publicDim != null  and publicDim != ''  ">FPUBLIC_DIM,</if>
+			<if test="flag != null  and flag != ''  ">FLAG,</if>
+			<if test="showFlag != null  and showFlag != ''  ">FSHOW_FLAG,</if>
+			<if test="srcField != null  and srcField != ''  ">FSRC_FIELD,</if>
+			<if test="groupName != null  and groupName != '' ">FGROUP_NAME,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="tableId != null  and tableId != ''  ">#{tableId},</if>
+			<if test="fieldName != null  and fieldName != ''  ">#{fieldName},</if>
+			<if test="fieldAlias != null  and fieldAlias != ''  ">#{fieldAlias},</if>
+			<if test="fieldType != null  and fieldType != ''  ">#{fieldType},</if>
+			<if test="length != null  ">#{length},</if>
+			<if test="scale != null  ">#{scale},</if>
+			<if test="publicDim != null  and publicDim != ''  ">#{publicDim},</if>
+			<if test="flag != null  and flag != ''  ">#{flag},</if>
+			<if test="showFlag != null  and showFlag != ''  ">#{showFlag},</if>
+			<if test="srcField != null  and srcField != ''  ">#{srcField},</if>
+			<if test="groupName != null and groupName != '' ">#{groupName},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateField" parameterType="com.yss.datamiddle.vo.datamodel.BiField">
+        update t_bi_field
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tableId != null  and tableId != ''  ">FTABLE_ID = #{tableId},</if>
+            <if test="fieldName != null  and fieldName != ''  ">FFIELD_NAME = #{fieldName},</if>
+            <if test="fieldAlias != null  and fieldAlias != ''  ">FFIELD_ALIAS = #{fieldAlias},</if>
+            <if test="fieldType != null  and fieldType != ''  ">FFIELD_TYPE = #{fieldType},</if>
+            <if test="length != null  ">FLENGTH = #{length},</if>
+            <if test="scale != null  ">FSCALE = #{scale},</if>
+            <if test="publicDim != null  and publicDim != ''  ">FPUBLIC_DIM = #{publicDim},</if>
+            <if test="flag != null  and flag != ''  ">FLAG = #{flag},</if>
+            <if test="showFlag != null  and showFlag != ''  ">FSHOW_FLAG = #{showFlag},</if>
+            <if test="srcField != null  and srcField != ''  ">FSRC_FIELD = #{srcField},</if>
+            <if test="groupName != null and groupName != '' ">FGROUP_NAME = #{groupName},</if>
+        </trim>
+        where FID = #{id}
+    </update>
+
+	<delete id="deleteFieldById" parameterType="String">
+        delete from t_bi_field where FID = #{id}
+    </delete>
+	
+    <delete id="deleteFieldByIds" parameterType="String">
+        delete from t_bi_field where FID in 
+        <foreach item="ids" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+     <delete id="deleteFieldByTableId" parameterType="String">
+     	delete from t_bi_field where FTABLE_ID = #{tableId}
+    </delete>
+    <select id="selectFields" resultMap="FieldResult">
+        SELECT
+            f.FID,
+            f.FFIELD_NAME,
+            f.FFIELD_ALIAS,
+            t.FTABLE_NAME FTABLE_ID
+        FROM
+            t_bi_table t
+            JOIN t_bi_field f ON t.FID = f.FTABLE_ID
+        WHERE
+            f.FSHOW_FLAG = 1 and t.table_flag = 0
+    </select>
+</mapper>

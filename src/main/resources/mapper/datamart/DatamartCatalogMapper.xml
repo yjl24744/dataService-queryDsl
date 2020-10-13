@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yss.datamiddle.mapper.datamart.DatamartCatalogMapper">
+
+	<resultMap type="com.yss.datamiddle.vo.datamart.DatamartCatalog" id="DatamartCatalogResult">
+		<result property="id" column="FID" />
+		<result property="name" column="FNAME" />
+		<result property="desc" column="FDESC" />
+		<result property="path" column="FPATH" />
+		<result property="creatorId" column="FCREATOR_ID" />
+		<result property="createTime" column="FCREATE_TIME" />
+		<result property="lastEditorId" column="FLAST_EDITOR_ID" />
+		<result property="lastEditTime" column="FLAST_EDIT_TIME" />
+		<result property="deleteTime" column="FDELETE_TIME" />
+		<result property="deleteState" column="FDELETE_STATE" />
+		<result property="checkState" column="FCHECK_STATE" />
+		<result property="checkerId" column="FCHECKER_ID" />
+		<result property="checkTime" column="FCHECK_TIME" />
+	</resultMap>
+
+	<sql id="selectDatamartCatalogVo">
+		SELECT FID, FNAME, FDESC, FPATH, FCREATOR_ID, FCREATE_TIME,
+		FLAST_EDITOR_ID,
+		FLAST_EDIT_TIME, FDELETE_TIME,
+		FDELETE_STATE,FCHECK_STATE,
+		FCHECKER_ID, FCHECK_TIME from
+		t_bi_datamart_catalog
+	</sql>
+
+	<select id="selectDatamartCatalogList"
+		resultMap="DatamartCatalogResult">
+		<include refid="selectDatamartCatalogVo" />
+		ORDER BY FCREATE_TIME
+	</select>
+
+	<select id="selectDatamartCatalogChildList"
+		resultMap="DatamartCatalogResult">
+		<include refid="selectDatamartCatalogVo" />
+		WHERE FPATH LIKE '${parentPath}%/%' AND FNAME=#{name}
+	</select>
+
+	<select id="selectDatamartCatalogIdListByPath"
+		parameterType="String" resultType="java.lang.String">
+		SELECT FID FROM
+		t_bi_datamart_catalog
+		WHERE FPATH like '${path}'
+		ORDER BY FCREATE_TIME
+	</select>
+
+	<select id="selectDatamartCatalogById" parameterType="String"
+		resultMap="DatamartCatalogResult">
+		<include refid="selectDatamartCatalogVo" />
+		WHERE FID = #{id}
+	</select>
+
+	<select id="validateDataExistByPath"
+		resultType="java.lang.Boolean">
+		SELECT COUNT(1) FROM t_bi_datamart_catalog_re WHERE
+		FDATAMART_ID IN (SELECT FID FROM t_bi_datamart_catalog WHERE FPATH
+		LIKE '${path}')
+	</select>
+	<insert id="insertDatamartCatalog"
+		parameterType="com.yss.datamiddle.vo.datamart.DatamartCatalog">
+		INSERT into t_bi_datamart_catalog
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="name != null  and name != ''  ">FNAME,</if>
+			<if test="desc != null  and desc != ''  ">FDESC,</if>
+			<if test="path != null  and path != ''  ">FPATH,</if>
+			<if test="creatorId != null  and creatorId != ''  ">FCREATOR_ID,</if>
+			<if test="createTime != null  and createTime != ''  ">FCREATE_TIME,</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">FLAST_EDITOR_ID,</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">FLAST_EDIT_TIME,</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">FDELETE_TIME,</if>
+			<if test="deleteState != null  and deleteState != ''  ">FDELETE_STATE,</if>
+			<if test="checkState != null  and checkState != ''  ">FCHECK_STATE,</if>
+			<if test="checkerId != null  and checkerId != ''  ">FCHECKER_ID,</if>
+			<if test="checkTime != null  and checkTime != ''  ">FCHECK_TIME,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="desc != null  and desc != ''  ">#{desc},</if>
+			<if test="path != null  and path != ''  ">#{path},</if>
+			<if test="creatorId != null  and creatorId != ''  ">#{creatorId},</if>
+			<if test="createTime != null  and createTime != ''  ">#{createTime},</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">#{lastEditorId},</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">#{lastEditTime},</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">#{deleteTime},</if>
+			<if test="deleteState != null  and deleteState != ''  ">#{deleteState},</if>
+			<if test="checkState != null  and checkState != ''  ">#{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">#{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">#{checkTime},</if>
+		</trim>
+	</insert>
+
+	<update id="updateDatamartCatalog"
+		parameterType="com.yss.datamiddle.vo.datamart.DatamartCatalog">
+		UPDATE t_bi_datamart_catalog
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="name != null  and name != ''  ">FNAME = #{name},</if>
+			<if test="desc != null ">FDESC = #{desc},</if>
+			<if test="path != null ">FPATH = #{path},</if>
+			<if test="creatorId != null  and creatorId != ''  ">FCREATOR_ID = #{creatorId},</if>
+			<if test="createTime != null  and createTime != ''  ">FCREATE_TIME = #{createTime},</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">FLAST_EDITOR_ID = #{lastEditorId},</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">FLAST_EDIT_TIME = #{lastEditTime},</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">FDELETE_TIME = #{deleteTime},</if>
+			<if test="deleteState != null  and deleteState != ''  ">FDELETE_STATE = #{deleteState},</if>
+			<if test="checkState != null  and checkState != ''  ">FCHECK_STATE = #{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">FCHECKER_ID = #{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">FCHECK_TIME = #{checkTime},</if>
+		</trim>
+		WHERE FID = #{id}
+	</update>
+
+	<update id="updateDatamartCatalogByPath">
+		UPDATE t_bi_datamart_catalog
+		SET
+		FPATH=REPLACE(FPATH,#{oldPath},#{newPath})
+		WHERE FPATH like
+		'${oldPath}'
+	</update>
+
+	<delete id="deleteDatamartCatalogByPath" parameterType="String">
+		DELETE
+		FROM
+		t_bi_datamart_catalog WHERE FPATH LIKE '${path}%'
+	</delete>
+</mapper>

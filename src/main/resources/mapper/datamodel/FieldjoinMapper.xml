@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yss.datamiddle.mapper.datamodel.FieldjoinMapper">
+
+	<resultMap type="com.yss.datamiddle.vo.datamodel.BiFieldjoin" id="FieldjoinResult">
+		<result property="id" column="FID" />
+		<result property="dsId" column="FDS_ID" />
+		<result property="tarDsId" column="FTAR_DS_ID" />
+		<result property="sourceTable" column="FSOURCE_TABLE" />
+		<result property="sourceField" column="FSOURCE_FIELD" />
+		<result property="targetTable" column="FTARGET_TABLE" />
+		<result property="targetField" column="FTARGET_FIELD" />
+		<result property="relation" column="FRELATION" />
+		<result property="operation" column="FOPERATION" />
+		<result property="operation" column="FOPERATION" />
+		<result property="createTime" column="FCREATE_TIME" />
+	</resultMap>
+
+	<sql id="selectFieldjoinVo">
+		select FID, FDS_ID, FTAR_DS_ID, FSOURCE_TABLE,
+		FSOURCE_FIELD, FTARGET_TABLE,
+		FTARGET_FIELD, FRELATION, FOPERATION,
+		FCREATE_TIME from t_bi_fieldjoin
+	</sql>
+
+	<select id="selectFieldjoinList" parameterType="com.yss.datamiddle.vo.datamodel.BiFieldjoin"
+		resultMap="FieldjoinResult">
+		<include refid="selectFieldjoinVo" />
+		<where>
+			<if test="id != null  and id != '' "> and FID = #{id}</if>
+			<if test="dsId != null  and dsId != '' "> and FDS_ID = #{dsId}</if>
+			<if test="tarDsId != null  and tarDsId != '' "> and FTAR_DS_ID = #{tarDsId}</if>
+			<if test="sourceTable != null  and sourceTable != '' "> and FSOURCE_TABLE = #{sourceTable}</if>
+			<if test="sourceField != null  and sourceField != '' "> and FSOURCE_FIELD = #{sourceField}</if>
+			<if test="targetTable != null  and targetTable != '' "> and FTARGET_TABLE = #{targetTable}</if>
+			<if test="targetField != null  and targetField != '' "> and FTARGET_FIELD = #{targetField}</if>
+			<if test="relation != null  and relation != '' "> and FRELATION = #{relation}</if>
+			<if test="operation != null  and operation != '' "> and FOPERATION = #{operation}</if>
+			<if test="createTime != null  and createTime != '' "> and FCREATE_TIME = #{createTime}</if>
+		</where>
+	</select>
+
+	<select id="selectFieldjoinById" parameterType="String"
+		resultMap="FieldjoinResult">
+		<include refid="selectFieldjoinVo" />
+		where FID = #{id}
+	</select>
+
+	<insert id="insertFieldjoin" parameterType="com.yss.datamiddle.vo.datamodel.BiFieldjoin">
+		insert into t_bi_fieldjoin
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="dsId != null  and dsId != ''  ">FDS_ID,</if>
+			<if test="tarDsId != null  and tarDsId != ''  ">FTAR_DS_ID,</if>
+			<if test="sourceTable != null  and sourceTable != ''  ">FSOURCE_TABLE,</if>
+			<if test="sourceField != null  and sourceField != ''  ">FSOURCE_FIELD,</if>
+			<if test="targetTable != null  and targetTable != ''  ">FTARGET_TABLE,</if>
+			<if test="targetField != null  and targetField != ''  ">FTARGET_FIELD,</if>
+			<if test="relation != null  and relation != ''  ">FRELATION,</if>
+			<if test="operation != null  and operation != ''  ">FOPERATION,</if>
+			<if test="createTime != null  and createTime != ''  ">FCREATE_TIME,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="dsId != null  and dsId != ''  ">#{dsId},</if>
+			<if test="tarDsId != null  and tarDsId != ''  ">#{tarDsId},</if>
+			<if test="sourceTable != null  and sourceTable != ''  ">#{sourceTable},</if>
+			<if test="sourceField != null  and sourceField != ''  ">#{sourceField},</if>
+			<if test="targetTable != null  and targetTable != ''  ">#{targetTable},</if>
+			<if test="targetField != null  and targetField != ''  ">#{targetField},</if>
+			<if test="relation != null  and relation != ''  ">#{relation},</if>
+			<if test="operation != null  and operation != ''  ">#{operation},</if>
+			<if test="createTime != null  and createTime != ''  ">#{createTime},</if>
+		</trim>
+	</insert>
+
+	<update id="updateFieldjoin" parameterType="com.yss.datamiddle.vo.datamodel.BiFieldjoin">
+		update t_bi_fieldjoin
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="dsId != null  and dsId != ''  ">FDS_ID = #{dsId},</if>
+			<if test="tarDsId != null  and tarDsId != ''  ">FTAR_DS_ID = #{tarDsId},</if>
+			<if test="sourceTable != null  and sourceTable != ''  ">FSOURCE_TABLE = #{sourceTable},</if>
+			<if test="sourceField != null  and sourceField != ''  ">FSOURCE_FIELD = #{sourceField},</if>
+			<if test="targetTable != null  and targetTable != ''  ">FTARGET_TABLE = #{targetTable},</if>
+			<if test="targetField != null  and targetField != ''  ">FTARGET_FIELD = #{targetField},</if>
+			<if test="relation != null  and relation != ''  ">FRELATION = #{relation},</if>
+			<if test="operation != null  and operation != ''  ">FOPERATION = #{operation},</if>
+			<if test="createTime != null  and createTime != ''  ">FCREATE_TIME = #{createTime},</if>
+		</trim>
+		where FID = #{id}
+	</update>
+
+	<delete id="deleteFieldjoins" parameterType="com.yss.datamiddle.vo.datamodel.BiFieldjoin">
+		delete from t_bi_fieldjoin where 1=1
+		<if test="dsId != null  and dsId != ''  "> AND FDS_ID = #{dsId}</if>
+		<if test="tarDsId != null  and tarDsId != ''  "> AND FTAR_DS_ID = #{tarDsId}</if>
+		<if test="sourceTable != null  and sourceTable != ''  "> AND FSOURCE_TABLE = #{sourceTable}</if>
+		<if test="targetTable != null  and targetTable != ''  "> AND FTARGET_TABLE = #{targetTable}</if>
+	</delete>
+
+	<delete id="deleteFieldjoinsByDsId" parameterType="String">
+		delete from t_bi_fieldjoin where 1=1
+		and (FDS_ID in
+		<foreach item="dsId" collection="array" open="(" separator=","
+			close=")">
+			#{dsId}
+		</foreach>
+		or FTAR_DS_ID in
+		<foreach item="dsId" collection="array" open="(" separator=","
+			close=")">
+			#{dsId}
+		</foreach>)
+	</delete>
+
+	<delete id="deleteFieldjoinById" parameterType="String">
+		delete from
+		t_bi_fieldjoin where FID = #{id}
+	</delete>
+
+	<delete id="deleteFieldjoinByIds" parameterType="String">
+		delete from t_bi_fieldjoin where FID in
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="selectFieldjoinsByTableName"
+		resultMap="FieldjoinResult">
+		<include refid="selectFieldjoinVo" />
+		<where>
+			FDS_ID = #{dsId} and (FSOURCE_TABLE = #{tableName} or
+			FTARGET_TABLE =
+			#{tableName}) order by FCREATE_TIME desc
+		</where>
+	</select>
+
+	<select id="selectByMultiDsTableName"
+		resultMap="FieldjoinResult">
+		<include refid="selectFieldjoinVo" />
+		<where>
+			and ((FDS_ID = #{dsId} and FSOURCE_TABLE=#{tableName})
+			or (FTAR_DS_ID
+			= #{dsId} and FTARGET_TABLE=#{tableName})
+			)
+			<if test="dsIdList != null and dsIdList.size > 0 ">
+				and (FDS_ID in
+				<foreach item="item" collection="dsIdList" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+				or FTAR_DS_ID in
+				<foreach item="item" collection="dsIdList" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+				)
+			</if>
+			<if test="tableList != null and tableList.size > 0 ">
+				and (FSOURCE_TABLE in
+				<foreach item="item" collection="tableList" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+				or FTARGET_TABLE in
+				<foreach item="item" collection="tableList" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+				)
+			</if>
+		</where>
+		order by FCREATE_TIME desc
+	</select>
+
+</mapper>

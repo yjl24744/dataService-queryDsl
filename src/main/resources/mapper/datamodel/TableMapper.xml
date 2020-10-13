@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yss.datamiddle.mapper.datamodel.TableMapper">
+    
+    <resultMap type="com.yss.datamiddle.vo.datamodel.BiTable" id="TableResult">
+        <result property="id"    column="FID"    />
+        <result property="tableName"    column="FTABLE_NAME"    />
+        <result property="tableAlias"    column="FTABLE_ALIAS"    />
+        <result property="dsId"    column="FDS_ID"    />
+        <result property="isfact"    column="FISFACT"    />
+        <result property="titleRow"    column="FTITLE_ROW"    />
+        <result property="tableNameExpr"    column="FGROUP"    />
+    </resultMap>
+	
+	<sql id="selectTableVo">
+        select FID, FTABLE_NAME, FTABLE_ALIAS, FDS_ID, FISFACT, FTITLE_ROW,FGROUP from t_bi_table
+    </sql>
+	
+    <select id="selectTableList" parameterType="com.yss.datamiddle.vo.datamodel.BiTable" resultMap="TableResult">
+        <include refid="selectTableVo"/>
+        <where>  
+            <if test="id != null  and id != '' "> and FID = #{id}</if>
+            <if test="tableName != null  and tableName != '' ">
+				and (
+				  upper(FTABLE_NAME) like '%${tableName}%'
+				  or upper(FTABLE_ALIAS) like '%${tableName}%'
+				  <if test="dsIds != null and dsIds.length > 0 ">
+						or FDS_ID in
+						<foreach item="item" index="index" collection="dsIds"
+							open="(" separator="," close=")">
+							#{item}
+						</foreach>
+				  </if>
+				)
+			 </if>           
+             <if test="tableAlias != null  and tableAlias != '' "> and FTABLE_ALIAS = #{tableAlias}</if>
+             <if test="dsId != null  and dsId != '' "> and FDS_ID = #{dsId}</if>
+             <if test="isfact != null  and isfact != '' "> and FISFACT = #{isfact}</if>
+             <if test="titleRow != null  and titleRow != '' "> and FTITLE_ROW = #{titleRow}</if>
+             <if test="tableNameExpr != null  and tableNameExpr != '' "> and FGROUP = #{tableNameExpr}</if>
+         </where>
+         order by fid desc
+    </select>
+    
+    <select id="selectTableById" parameterType="String" resultMap="TableResult">
+        <include refid="selectTableVo"/>
+        where FID = #{id}
+    </select>
+    
+     <select id="selectTableByIds"  resultMap="TableResult">
+        <include refid="selectTableVo"/>
+         where fid in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+        
+    <insert id="insertTable" parameterType="com.yss.datamiddle.vo.datamodel.BiTable">
+        insert into t_bi_table
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="tableName != null  and tableName != ''  ">FTABLE_NAME,</if>
+			<if test="tableAlias != null  and tableAlias != ''  ">FTABLE_ALIAS,</if>
+			<if test="dsId != null  and dsId != ''  ">FDS_ID,</if>
+			<if test="isfact != null  and isfact != ''  ">FISFACT,</if>
+			<if test="titleRow != null  and titleRow != ''  ">FTITLE_ROW,</if>
+			<if test="tableNameExpr != null  and tableNameExpr != ''  ">FGROUP,</if>
+			<if test="tableFlag != null  and tableFlag != ''  ">TABLE_FLAG</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="tableName != null  and tableName != ''  ">#{tableName},</if>
+			<if test="tableAlias != null  and tableAlias != ''  ">#{tableAlias},</if>
+			<if test="dsId != null  and dsId != ''  ">#{dsId},</if>
+			<if test="isfact != null  and isfact != ''  ">#{isfact},</if>
+			<if test="titleRow != null  and titleRow != ''  ">#{titleRow},</if>
+			<if test="tableNameExpr != null  and tableNameExpr != ''  ">#{tableNameExpr},</if>
+			<if test="tableFlag != null  and tableNameExpr != ''  ">#{tableFlag}</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTable" parameterType="com.yss.datamiddle.vo.datamodel.BiTable">
+        update t_bi_table
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tableName != null  and tableName != ''  ">FTABLE_NAME = #{tableName},</if>
+            <if test="tableAlias != null  and tableAlias != ''  ">FTABLE_ALIAS = #{tableAlias},</if>
+            <if test="dsId != null  and dsId != ''  ">FDS_ID = #{dsId},</if>
+            <if test="isfact != null  and isfact != '' ">FISFACT = #{isfact},</if>
+            <if test="titleRow != null  and titleRow != '' ">FTITLE_ROW = #{titleRow},</if>
+            <if test="tableNameExpr != null  and tableNameExpr != '' ">FGROUP = #{tableNameExpr}</if>
+        </trim>
+        where FID = #{id}
+    </update>
+
+	<delete id="deleteTableById" parameterType="String">
+        delete from t_bi_table where FID = #{id}
+    </delete>
+	
+    <delete id="deleteTableByIds" parameterType="String">
+        delete from t_bi_table where FID in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteTableByDsTableName">
+        delete from t_bi_table where FDS_ID = #{dsId} and FTABLE_NAME = #{tableName}  
+    </delete>
+    
+    <select id="selectTablesByDsId" parameterType="String" resultMap="TableResult">
+    	<include refid="selectTableVo"/>
+    	where FDS_ID = #{dsId}
+    </select>
+	
+	<select id="selectTablesByDsIdAndTableName"  resultMap="TableResult">
+    	<include refid="selectTableVo"/>
+    	where FTABLE_NAME = #{tableName} 
+    	and ( FDS_ID = #{srcDsId} OR FDS_ID = #{tarDsId} )
+    </select>
+    <select id="selectTableByDsIdAndTableName"  resultMap="TableResult">
+    	<include refid="selectTableVo"/>
+    	where upper(FTABLE_NAME) = upper(#{tableName}) 
+    	and FDS_ID = #{srcDsId}
+    </select>
+    <select id="selectGroupTablesByDsId" parameterType="String" resultMap="TableResult">
+        <include refid="selectTableVo"/>
+		where FDS_ID = #{dsId} and FGROUP is not null
+    </select>    
+</mapper>

@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yss.datamiddle.mapper.tableview.TableviewMapper">
+
+	<resultMap type="com.yss.datamiddle.vo.tableview.TableViewVO" id="TableviewResult">
+		<result property="id" column="FID" />
+		<result property="viewAlias" column="FVIEW_ALIAS" />
+		<result property="name" column="FNAME" />
+		<result property="description" column="FDESC" />
+		<result property="content" column="FCONTENT" />
+		<result property="dsId" column="FDS_ID" />
+		<result property="sql" column="FSQL" />
+		<result property="inlineDim" column="FINLINE_DIM" />
+		<result property="relationField" column="FRELATION_FIELD" />
+		<result property="creatorId" column="FCREATOR_ID" />
+		<result property="createTime" column="FCREATE_TIME" />
+		<result property="lastEditorId" column="FLAST_EDITOR_ID" />
+		<result property="lastEditTime" column="FLAST_EDIT_TIME" />
+		<result property="deleteTime" column="FDELETE_TIME" />
+		<result property="deleteState" column="FDELETE_STATE" />
+		<result property="checkState" column="FCHECK_STATE" />
+		<result property="checkerId" column="FCHECKER_ID" />
+		<result property="checkTime" column="FCHECK_TIME" />
+		<!-- <result property="extdataServiceState" column="FEXTDATA_SERVICE_STATE" 
+			/> -->
+		<result property="createView" column="FCREATE_VIEW" />
+		<result property="datamartId" column="FDATAMART_ID" />
+		<result property="dsName" column="FDS_NAME" />
+		<result property="service" column="FSERVICE" />
+	</resultMap>
+
+	<resultMap type="Map" id="ViewDatamartCatalogData">
+		<result property="dsId" column="FDS_ID" />
+		<result property="tableName" column="FNAME" />
+		<result property="tableAlias" column="FVIEW_ALIAS" />
+		<result property="pId" column="FDATAMART_ID" />
+		<result property="tableType" column="FTABLE_TYPE" />
+	</resultMap>
+
+	<sql id="selectTableviewVo">
+		select tv.FID, FVIEW_ALIAS, FNAME, FDESC, FCONTENT, FDS_ID,
+		FSQL, FINLINE_DIM,
+		FRELATION_FIELD, FCREATOR_ID, FCREATE_TIME,
+		FLAST_EDITOR_ID,
+		FLAST_EDIT_TIME, FDELETE_TIME, FDELETE_STATE,
+		FCHECK_STATE,
+		FCHECKER_ID,
+		FCHECK_TIME,FCREATE_VIEW,dmr.FDATAMART_ID
+		from
+		t_bi_tableview tv
+		left join
+		t_bi_datamart_catalog_re dmr on tv.FID =
+		dmr.FREL_ID and
+		dmr.FDATA_TYPE=1
+	</sql>
+
+	<!--
+	<select id="selectTableviewList" parameterType="com.yss.datamiddle.vo.tableview.TableViewVO"
+		resultMap="TableviewResult">
+		<include refid="selectTableviewVo" />
+		<where>
+			<if test="id != null  and id != '' "> and tv.FID = #{id}</if>
+			<if test="viewAlias != null  and viewAlias != '' "> and FVIEW_ALIAS = #{viewAlias}</if>
+			<if test="name != null  and name != '' ">
+				and (upper(fname) like upper('%${name}%') or
+				upper(FVIEW_ALIAS)
+				like upper('%${name}%'))
+			</if>
+			<if test="description != null  and description != '' "> and FDESC = #{description}</if>
+			<if test="dsId != null  and dsId != '' "> and FDS_ID = #{dsId}</if>
+			<if test="inlineDim != null  and inlineDim != '' "> and FINLINE_DIM = #{inlineDim}</if>
+			<if test="deleteState != null  and deleteState != '' "> and FDELETE_STATE = #{deleteState}</if>
+			<if test="checkState != null  and checkState != '' "> and FCHECK_STATE = #{checkState}</if>
+			<if test="createView != null  and createView != '' "> and FCREATE_VIEW = #{createView}</if>
+			<if test="path != null and path !='' ">
+				AND tv.FID IN (SELECT FREL_ID FROM
+				t_bi_datamart_catalog_re
+				WHERE FDATA_TYPE='1' AND FDATAMART_ID IN
+				(SELECT FID FROM
+				t_bi_datamart_catalog WHERE FPATH LIKE '${path}%'))
+			</if>
+		</where>
+	</select>
+	 已完成 -->
+
+	<select id="selectTableviewList4Perms"
+		resultMap="TableviewResult">
+		SELECT
+		TV.FID,TV.FNAME,TV.FVIEW_ALIAS,TV.FCHECK_STATE,TV.FINLINE_DIM,TV.FCREATE_VIEW,TV.FDESC,TV.FCREATE_TIME,
+		TV.FDS_ID,DMR.FDATAMART_ID,DS.FNAME FDS_NAME,(case when (SELECT
+		count(1) FROM t_bi_service TSER WHERE TSER.FTYPE='1' and
+		TSER.FREL_ID=TV.FID) >0 then 1 else 0 end) fservice
+		FROM
+		t_bi_tableview
+		TV
+		LEFT
+		JOIN
+		t_bi_ds
+		DS ON TV.FDS_ID=DS.FID
+		LEFT JOIN
+		t_bi_datamart_catalog_re
+		DMR ON TV.FID =
+		DMR.FREL_ID AND
+		DMR.FDATA_TYPE=1
+		<where>
+			<if test="tableview.id != null  and tableview.id != '' "> AND TV.FID = #{tableview.id}</if>
+			<if
+				test="tableview.viewAlias != null  and tableview.viewAlias != '' "> AND TV.FVIEW_ALIAS = #{tableview.viewAlias}</if>
+			<if test="tableview.name != null  and tableview.name != '' ">
+				AND (upper(TV.fname) like '%${tableview.name}%' or
+				upper(TV.FVIEW_ALIAS)
+				like
+				'%${tableview.name}%')
+			</if>
+			<if test="tableview.dsId != null  and tableview.dsId != '' "> AND TV.FDS_ID = #{tableview.dsId}</if>
+			<if
+				test="tableview.inlineDim != null  and tableview.inlineDim != '' "> AND TV.FINLINE_DIM = #{tableview.inlineDim}</if>
+			<if
+				test="tableview.deleteState != null  and tableview.deleteState != '' "> AND TV.FDELETE_STATE = #{tableview.deleteState}</if>
+			<if
+				test="tableview.checkState != null  and tableview.checkState != '' "> AND TV.FCHECK_STATE = #{tableview.checkState}</if>
+			<if
+				test="tableview.createView != null  and tableview.createView != '' "> AND TV.FCREATE_VIEW = #{tableview.createView}</if>
+			<if test="tableview.path != null and tableview.path !='' ">
+				AND TV.FID IN (SELECT FREL_ID FROM
+				t_bi_datamart_catalog_re
+				WHERE FDATA_TYPE='1' AND FDATAMART_ID IN
+				(SELECT FID FROM
+				t_bi_datamart_catalog WHERE FPATH LIKE
+				'${tableview.path}%'))
+			</if>
+			<if test="dataIds != null and dataIds.size == 0 ">
+				AND 1=2
+			</if>
+			<if test="dataIds != null and dataIds.size > 0 ">
+				AND TV.FID in
+				<foreach item="item" index="index" collection="dataIds"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY TV.FCREATE_TIME DESC
+	</select>
+
+	<!--
+	<select id="selectTableviewById" parameterType="String"
+		resultMap="TableviewResult">
+		<include refid="selectTableviewVo" />
+		where tv.FID = #{id}
+	</select>
+
+	<select id="selectTableviewByIds" parameterType="String" resultMap="TableviewResult">
+		<include refid="selectTableviewVo" />
+		where tv.FID in
+		<foreach item="id" collection="ids" open="(" separator=","
+				 close=")">
+			#{id}
+		</foreach>
+	</select>
+	已完成 -->
+
+	<!--
+	<select id="selectTableviewByNames" parameterType="String"
+		resultMap="TableviewResult">
+		<include refid="selectTableviewVo" />
+		where FNAME in
+		<foreach item="name" collection="array" open="(" separator=","
+			close=")">
+			#{name}
+		</foreach>
+	</select>
+	已完成 -->
+
+	<!--
+	<select id="selectTableviewByName" parameterType="String"
+		resultMap="TableviewResult">
+		<include refid="selectTableviewVo" />
+		where upper(FNAME) = upper(#{name})
+	</select>
+	已完成 -->
+	<!--
+	<select id="validateDataNonChecked"
+		resultType="java.lang.Boolean">
+		SELECT COUNT(1) FROM t_bi_tableview WHERE FCHECK_STATE=0 AND FID IN
+		<foreach item="item" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	已完成 -->
+
+	<!--
+	<insert id="insertTableview" parameterType="com.yss.datamiddle.vo.tableview.TableView">
+		insert into t_bi_tableview
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">FID,</if>
+			<if test="viewAlias != null  and viewAlias != ''  ">FVIEW_ALIAS,</if>
+			<if test="name != null  and name != ''  ">FNAME,</if>
+			<if test="description != null  and description != ''  ">FDESC,</if>
+			<if test="dsId != null  and dsId != ''  ">FDS_ID,</if>
+			<if test="sql != null  and sql != ''  ">FSQL,</if>
+			<if test="inlineDim != null  and inlineDim != '' ">FINLINE_DIM,</if>
+			<if test="relationField != null  and relationField != '' ">FRELATION_FIELD,</if>
+			<if test="creatorId != null  and creatorId != ''  ">FCREATOR_ID,</if>
+			<if test="createTime != null  and createTime != ''  ">FCREATE_TIME,</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">FLAST_EDITOR_ID,</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">FLAST_EDIT_TIME,</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">FDELETE_TIME,</if>
+			<if test="deleteState != null  and deleteState != ''  ">FDELETE_STATE,</if>
+			<if test="checkState != null  and checkState != ''  ">FCHECK_STATE,</if>
+			<if test="checkerId != null  and checkerId != ''  ">FCHECKER_ID,</if>
+			<if test="checkTime != null  and checkTime != ''  ">FCHECK_TIME,</if>
+			<if test="createView != null  and createView != '' ">FCREATE_VIEW,</if>
+			<if test="content != null  and content != '' ">FCONTENT</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="viewAlias != null  and viewAlias != ''  ">#{viewAlias},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="description != null  and description != ''  ">#{description},</if>
+			<if test="dsId != null  and dsId != ''  ">#{dsId},</if>
+			<if test="sql != null  and sql != ''  ">#{sql},</if>
+			<if test="inlineDim != null  and inlineDim != '' ">#{inlineDim},</if>
+			<if test="relationField != null  and relationField != '' ">#{relationField},</if>
+			<if test="creatorId != null  and creatorId != ''  ">#{creatorId},</if>
+			<if test="createTime != null  and createTime != ''  ">#{createTime},</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">#{lastEditorId},</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">#{lastEditTime},</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">#{deleteTime},</if>
+			<if test="deleteState != null  and deleteState != ''  ">#{deleteState},</if>
+			<if test="checkState != null  and checkState != ''  ">#{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">#{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">#{checkTime},</if>
+			<if test="createView != null  and createView != '' ">#{createView},</if>
+			<if test="content != null  and content != '' ">#{content}</if>
+		</trim>
+	</insert>
+
+	<update id="updateTableview" parameterType="com.yss.datamiddle.vo.tableview.TableView">
+		update t_bi_tableview
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="viewAlias != null  and viewAlias != ''  ">FVIEW_ALIAS = #{viewAlias},</if>
+			<if test="name != null  and name != ''  ">FNAME = #{name},</if>
+			<if test="description != null ">FDESC = #{description},</if>
+			<if test="dsId != null  and dsId != ''  ">FDS_ID = #{dsId},</if>
+			<if test="sql != null  and sql != ''  ">FSQL = #{sql},</if>
+			<if test="inlineDim != null  and inlineDim != '' ">FINLINE_DIM = #{inlineDim},</if>
+			<if test="relationField != null  and relationField != '' ">FRELATION_FIELD = #{relationField},</if>
+			<if test="creatorId != null  and creatorId != ''  ">FCREATOR_ID = #{creatorId},</if>
+			<if test="createTime != null  and createTime != ''  ">FCREATE_TIME = #{createTime},</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">FLAST_EDITOR_ID = #{lastEditorId},</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">FLAST_EDIT_TIME = #{lastEditTime},</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">FDELETE_TIME = #{deleteTime},</if>
+			<if test="deleteState != null  and deleteState != ''  ">FDELETE_STATE = #{deleteState},</if>
+			<if test="checkState != null  and checkState != ''  ">FCHECK_STATE = #{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">FCHECKER_ID = #{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">FCHECK_TIME = #{checkTime},</if>
+			<if test="createView != null  and createView != '' ">FCREATE_VIEW = #{createView},</if>
+			<if test="content != null  and content != '' ">FCONTENT = #{content}</if>
+		</trim>
+		where FID = #{id}
+	</update>
+
+	<update id="updateCheckState">
+		update t_bi_tableview
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="checkState != null  and checkState != ''  ">FCHECK_STATE = #{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">FCHECKER_ID = #{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">FCHECK_TIME = #{checkTime}</if>
+		</trim>
+		where FID in
+		<foreach item="item" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	已完成 -->
+
+	<!--
+	<delete id="deleteTableviewById" parameterType="String">
+		delete from
+		t_bi_tableview where FID = #{id}
+	</delete>
+
+	<delete id="deleteTableviewByIds" parameterType="String">
+		delete from t_bi_tableview where FID in
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete> -->
+	<!-- <update id="publishTableviewByIds" parameterType="String"> update t_bi_tableview 
+		set FEXTDATA_SERVICE_STATE='1' where FID in <foreach item="id" collection="ids" 
+		open="(" separator="," close=")"> #{id} </foreach> </update> <update id="unpublishTableviewByIds" 
+		parameterType="String"> update t_bi_tableview set FEXTDATA_SERVICE_STATE='0' 
+		where FID in <foreach item="id" collection="ids" open="(" separator="," close=")"> 
+		#{id} </foreach> </update> -->
+	<select id="getViewDatamartCatalogData" parameterType="String"
+		resultMap="ViewDatamartCatalogData">
+		SELECT TV.FDS_ID,TV.FNAME,TV.FVIEW_ALIAS,(CASE WHEN
+		TCR.FDATAMART_ID IS NULL THEN DATAMART.FID ELSE TCR.FDATAMART_ID END)
+		AS FDATAMART_ID,'view' as
+		FTABLE_TYPE FROM (SELECT
+		FID,FDS_ID,FNAME,FVIEW_ALIAS FROM
+		t_bi_tableview WHERE
+		FDS_ID=#{dsId}
+		AND fCREATE_VIEW=1) TV LEFT JOIN
+		t_bi_datamart_catalog_re TCR ON
+		TCR.FDATA_TYPE='1' AND TV.FID=TCR.FREL_ID
+		LEFT JOIN (SELECT FID FROM
+		t_bi_datamart_catalog
+		WHERE FNAME='数据集市')
+		DATAMART ON 1=1
+	</select>
+
+	<select id="existName" parameterType="java.lang.String"
+		resultType="java.lang.Boolean">
+		select count(1) from t_bi_tableview where upper(fname) =
+		upper(#{name})
+	</select>
+
+	<select id="existAlias" parameterType="java.lang.String"
+		resultType="java.lang.Boolean">
+		select count(1) from t_bi_tableview where
+		upper(fview_alias) =
+		upper(#{name})
+	</select>
+	<select id="selectTableview" resultMap="TableviewResult">
+		SELECT
+		TV.FID,
+		TV.FNAME,
+		TV.FVIEW_ALIAS,
+		DMR.FDATAMART_ID
+		FROM
+			t_bi_tableview TV
+		LEFT JOIN t_bi_datamart_catalog_re DMR ON TV.FID = DMR.FREL_ID
+		AND DMR.FDATA_TYPE =1
+	</select>
+
+</mapper>

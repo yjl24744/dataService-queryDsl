@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yss.datamiddle.mapper.datamodel.DataModelMapper">
+
+	<resultMap type="com.yss.datamiddle.vo.datamodel.DataModel" id="DataModelResult">
+		<result property="id" column="fid" />
+		<result property="code" column="fcode" />
+		<result property="name" column="fname" />
+		<result property="version" column="fversion" />
+		<result property="description" column="fdesc" />
+		<result property="schema" column="fschema" />
+		<result property="content" column="fcontent" />
+		<result property="parameters" column="fparameters" />
+		<result property="dataType" column="fdata_type" />
+		<result property="srcDsId" column="fsrc_ds_id" />
+		<result property="dsId" column="fds_id" />
+		<result property="dmState" column="fdm_state" />
+		<result property="creatorId" column="fcreator_id" />
+		<result property="createTime" column="fcreate_time" />
+		<result property="lastEditorId" column="flast_editor_id" />
+		<result property="lastEditTime" column="flast_edit_time" />
+		<result property="deleteTime" column="fdelete_time" />
+		<result property="deleteState" column="fdelete_state" />
+		<result property="checkState" column="fcheck_state" />
+		<result property="checkerId" column="fchecker_id" />
+		<result property="checkTime" column="fcheck_time" />
+		<result property="extension" column="fextension" />
+		<result property="datamartId" column="fdatamart_id" />
+		<result property="sql" column="fsql" />
+		<result property="serviceparams" column="fserviceparams" />
+	</resultMap>
+
+	<resultMap type="com.yss.datamiddle.vo.datamodel.ThemeVO" id="ThemeVOResult">
+		<result property="id" column="fid" />
+		<result property="code" column="fcode" />
+		<result property="name" column="fname" />
+		<result property="version" column="fversion" />
+		<result property="description" column="fdesc" />
+		<result property="dataType" column="fdata_type" />
+		<result property="srcDsId" column="fsrc_ds_id" />
+		<result property="dmState" column="fdm_state" />
+		<result property="creatorId" column="fcreator_id" />
+		<result property="createTime" column="fcreate_time" />
+		<result property="lastEditorId" column="flast_editor_id" />
+		<result property="lastEditTime" column="flast_edit_time" />
+		<result property="deleteTime" column="fdelete_time" />
+		<result property="deleteState" column="fdelete_state" />
+		<result property="checkState" column="fcheck_state" />
+		<result property="checkerId" column="fchecker_id" />
+		<result property="checkTime" column="fcheck_time" />
+		<result property="service" column="FSERVICE" />
+	</resultMap>
+
+	<sql id="selectDataModelVo">
+		select a.fid, a.fcode, a.fname, a.fversion,
+		a.fdesc,a.fschema,a.fcontent,a.fparameters,a.fdata_type,a.fsrc_ds_id,a.fds_id,a.fdm_state,
+		a.fcreator_id, a.fcreate_time, a.flast_editor_id, a.flast_edit_time,
+		a.fdelete_time,
+		a.fdelete_state, a.fcheck_state, a.fchecker_id,
+		a.fcheck_time,a.fextension,a.fsql,a.fserviceparams,dmr.FDATAMART_ID
+		from
+		t_bi_datamodel a
+		left join t_bi_datamart_catalog_re dmr on a.FID = dmr.FREL_ID and
+		dmr.FDATA_TYPE=0
+		where 1=1
+	</sql>
+
+	<select id="selectDataModelById" parameterType="String"
+		resultMap="DataModelResult">
+		<include refid="selectDataModelVo" />
+		and a.fid = #{id}
+	</select>
+
+	<select id="selectDataModelByCodeAndVer"
+		resultMap="DataModelResult">
+		<include refid="selectDataModelVo" />
+		and (a.fcode = #{code} or a.fid = #{code})
+		<if test="version != null  and version != ''  ">
+			and a.fversion = #{version}
+		</if>
+		<if test="version == null or version == ''  ">
+			and a.fversion is null
+		</if>
+	</select>
+
+	<select id="selectDataModelByCode" resultMap="DataModelResult">
+		<include refid="selectDataModelVo" />
+		and a.fcode = #{code}
+	</select>
+
+	<select id="selectDataModels" resultMap="ThemeVOResult"
+		parameterType="com.yss.datamiddle.vo.datamodel.DataModelVo">
+		select a.fid, a.fcode, a.fname, a.fversion,
+		a.fdesc,a.fparameters,a.fdata_type,a.fsrc_ds_id,fdm_state,
+		a.fcreator_id, a.fcreate_time, a.flast_editor_id, a.flast_edit_time,
+		a.fdelete_time,
+		a.fdelete_state, a.fcheck_state, a.fchecker_id,
+		a.fcheck_time,a.fserviceparams,(case when (SELECT count(1) FROM t_bi_service TSER WHERE
+		TSER.FTYPE='0' and TSER.FREL_ID=a.FID) >0 then 1 else 0 end)
+		fservice
+		from
+		t_bi_datamodel a
+		where 1=1
+		<if test="id != null  and id != '' "> and a.fid = #{id}</if>
+		<if test="code != null  and code != '' "> and a.fcode like '%${code}%'</if>
+		<if test="name != null  and name != '' ">
+			and (
+			upper(a.fname) like '%${name}%'
+			or upper(a.fcode) like
+			'%${name}%'
+			<if test="dsIds != null and dsIds.length > 0 ">
+				or a.fsrc_ds_id in
+				<foreach item="item" index="index" collection="dsIds"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			)
+		</if>
+		<if test="checkState != null and checkState != '' "> and a.fcheck_state = #{checkState}</if>
+		<if test="dmState != null and dmState != '' "> and a.fdm_state = #{dmState}</if>
+		<if test="dataIds != null and dataIds.size == 0 ">
+			and 1=2
+		</if>
+		<if test="dataIds != null and dataIds.size > 0 ">
+			and fid in
+			<foreach item="item" index="index" collection="dataIds"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="path != null and path !='' ">
+			AND a.FID IN (SELECT FREL_ID FROM t_bi_datamart_catalog_re
+			WHERE FDATA_TYPE='0' AND FDATAMART_ID IN (SELECT FID FROM
+			t_bi_datamart_catalog WHERE FPATH LIKE '${path}%'))
+		</if>
+		order by a.fcreate_time desc
+	</select>
+
+	<select id="selectReportDataModes" resultMap="DataModelResult">
+		select t.fid,t.fname,t.fversion,dmr.fdatamart_id from t_bi_datamodel t
+		left join t_bi_datamart_catalog_re dmr on t.FID = dmr.FREL_ID and
+		dmr.FDATA_TYPE=0
+		where (t.fchecker_id = #{userId} or t.fcreator_id =
+		#{userId}) and
+		t.fcheck_state = '1'
+		UNION
+		SELECT
+		a.fid,a.fname,a.fversion,dmr.fdatamart_id from t_bi_datamodel a
+		left
+		join t_bi_datamart_catalog_re dmr on a.FID = dmr.FREL_ID and
+		dmr.FDATA_TYPE=0
+		<where>
+			a.fcheck_state = '1'
+			<if test="dataIds != null and dataIds.size == 0 ">
+				and a.fid in('')
+			</if>
+			<if test="dataIds != null and dataIds.size > 0 ">
+				and a.fid in
+				<foreach item="item" index="index" collection="dataIds"
+					open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		order by fname desc
+
+	</select>
+
+	<select id="selectDataModeList" resultMap="DataModelResult">
+		<include refid="selectDataModelVo" />
+		<if test="dataIds != null and dataIds.size > 0 ">
+			and a.FID in
+			<foreach item="item" index="index" collection="dataIds"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	<insert id="insertDataModel" parameterType="com.yss.datamiddle.vo.datamodel.DataModel">
+		insert into t_bi_datamodel
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">fid,</if>
+			<if test="code != null  and code != ''  ">fcode,</if>
+			<if test="name != null  and name != ''  ">fname,</if>
+			<if test="version != null  and version != ''  ">fversion,</if>
+			<if test="description != null  and description != ''  ">fdesc,</if>
+			<if test="parameters != null  and parameters != ''  ">fparameters,</if>
+			<if test="dataType != null  and dataType != ''  ">fdata_type,</if>
+			<if test="dsId != null and dsId != ''  ">fds_id,</if>
+			<if test="srcDsId != null and srcDsId != ''  ">fsrc_ds_id,</if>
+			<if test="dmState != null and dmState != ''  ">fdm_state,</if>
+			<if test="creatorId != null  and creatorId != ''  ">fcreator_id,</if>
+			<if test="createTime != null  and createTime != ''  ">fcreate_time,</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">flast_editor_id,</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">flast_edit_time,</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">fdelete_time,</if>
+			<if test="deleteState != null  ">fdelete_state,</if>
+			<if test="checkState != null  ">fcheck_state,</if>
+			<if test="checkerId != null  and checkerId != ''  ">fchecker_id,</if>
+			<if test="checkTime != null  and checkTime != ''  ">fcheck_time,</if>
+			<if test="extension != null  and extension != ''  ">fextension,</if>
+			<if test="sql != null  and sql != ''  ">fsql,</if>
+			<if test="schema != null  and schema != ''  ">fschema,</if>
+			<if test="content != null  and content != ''  ">fcontent,</if>
+			<if test="serviceparams != null  and serviceparams != ''  ">fserviceparams,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  and id != ''  ">#{id},</if>
+			<if test="code != null  and code != ''  ">#{code},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="version != null  and version != ''  ">#{version},</if>
+			<if test="description != null  and description != ''  ">#{description},</if>
+			<if test="parameters != null  and parameters != ''  ">#{parameters},</if>
+			<if test="dataType != null  and dataType != ''  ">#{dataType},</if>
+			<if test="dsId != null and dsId != ''  ">#{dsId},</if>
+			<if test="srcDsId != null and srcDsId != ''  ">#{srcDsId},</if>
+			<if test="dmState != null and dmState != ''  ">#{dmState},</if>
+			<if test="creatorId != null  and creatorId != ''  ">#{creatorId},</if>
+			<if test="createTime != null  and createTime != ''  ">#{createTime},</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">#{lastEditorId},</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">#{lastEditTime},</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">#{deleteTime},</if>
+			<if test="deleteState != null  ">#{deleteState},</if>
+			<if test="checkState != null  ">#{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">#{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">#{checkTime},</if>
+			<if test="extension != null  and extension != ''  ">#{extension},</if>
+			<if test="sql != null  and sql != ''  ">#{sql},</if>
+			<if test="schema != null  and schema != ''  ">#{schema},</if>
+			<if test="content != null  and content != ''  ">#{content},</if>
+			<if test="serviceparams != null  and serviceparams != ''  ">#{serviceparams},</if>
+		</trim>
+	</insert>
+	<update id="updateDataModel" parameterType="com.yss.datamiddle.vo.datamodel.DataModel">
+		update t_bi_datamodel
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="code != null  and code != ''  ">fcode = #{code},</if>
+			<if test="name != null  and name != ''  ">fname = #{name},</if>
+			<if test="version != null  and version != ''  ">fversion = #{version},</if>
+			<if test="description != null ">fdesc = #{description},</if>
+			<if test="parameters != null  and parameters != ''  ">fparameters = #{parameters},</if>
+			<if test="dataType != null  and dataType != ''  ">fdata_type = #{dataType},</if>
+			<if test="dsId != null and dsId != ''  ">fds_id = #{dsId},</if>
+			<if test="srcDsId != null and srcDsId != ''  ">fsrc_ds_id = #{srcDsId},</if>
+			<if test="dmState != null and dmState != ''  ">fdm_state = #{dmState},</if>
+			<if test="creatorId != null  and creatorId != ''  ">fcreator_id = #{creatorId},</if>
+			<if test="createTime != null  and createTime != ''  ">fcreate_time = #{createTime},</if>
+			<if test="lastEditorId != null  and lastEditorId != ''  ">flast_editor_id = #{lastEditorId},</if>
+			<if test="lastEditTime != null  and lastEditTime != ''  ">flast_edit_time = #{lastEditTime},</if>
+			<if test="deleteTime != null  and deleteTime != ''  ">fdelete_time = #{deleteTime},</if>
+			<if test="deleteState != null  ">fdelete_state = #{deleteState},</if>
+			<if test="checkState != null  ">fcheck_state = #{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">fchecker_id = #{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">fcheck_time = #{checkTime},</if>
+			<if test="extension != null  and extension != ''  ">fextension = #{extension},</if>
+			<if test="sql != null ">fsql = #{sql},</if>
+			<if test="schema != null  and schema != ''  ">fschema = #{schema},</if>
+			<if test="content != null  and content != ''  ">fcontent = #{content},</if>
+			<if test="serviceparams != null  and serviceparams != ''  ">fserviceparams = #{serviceparams},</if>
+		</trim>
+		where fid = #{id}
+	</update>
+	<update id="updateCheckState">
+		update t_bi_datamodel
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="checkState != null  and checkState != ''  ">FCHECK_STATE = #{checkState},</if>
+			<if test="checkerId != null  and checkerId != ''  ">FCHECKER_ID = #{checkerId},</if>
+			<if test="checkTime != null  and checkTime != ''  ">FCHECK_TIME = #{checkTime}</if>
+		</trim>
+		where FID in
+		<foreach item="item" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	<delete id="deleteDataModel" parameterType="String">
+		delete from t_bi_datamodel where fid in
+		<foreach item="id" collection="array" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</delete>
+	<select id="selectCountDataModelByDsId" parameterType="String"
+		resultType="int">
+		select count(1) from t_bi_datamodel where (fds_id = #{dsId}
+		or fsrc_ds_id = #{dsId})
+	</select>
+
+	<select id="checkCodeUnique" resultMap="DataModelResult">
+		select fid, fcode, fname,
+		fversion, fdata_type, fsrc_ds_id, fds_id,
+		fdm_state
+		from t_bi_datamodel
+		where fcode = #{code}
+		<if test="version != null  and version != ''  "> and fversion = #{version} </if>
+	</select>
+
+	<select id="checkNameUnique" resultMap="DataModelResult">
+		select fid, fcode, fname,
+		fversion, fdata_type, fsrc_ds_id, fds_id,
+		fdm_state
+		from t_bi_datamodel
+		where fname = #{name}
+		<if test="version != null  and version != ''  "> and fversion = #{version} </if>
+	</select>
+	<select id="checkUnique" resultType="java.lang.Integer">
+		select count(*)
+		from t_bi_datamodel
+		where 1=1
+		<if test="code != null  and code != ''  ">
+			and fcode = #{code}
+		</if>
+		<if test="version != null  and version != ''  ">
+			and fversion = #{version}
+		</if>
+		<if test="version == null or version == ''  ">
+			and fversion is null
+		</if>
+	</select>
+	<select id="selectDataModelByCodeNameVer"
+		resultMap="DataModelResult">
+		<include refid="selectDataModelVo" />
+		and a.fcode = #{code}
+		and a.fname = #{name}
+		<if test="version != null  and version != ''  ">
+			and a.fversion = #{version}
+		</if>
+		<if test="version == null or version == ''  ">
+			and a.fversion is null
+		</if>
+	</select>
+	<select id="validateDataNonChecked"
+		resultType="java.lang.Boolean">
+		SELECT COUNT(1) FROM t_bi_datamodel WHERE FCHECK_STATE=0 AND FID IN
+		<foreach item="item" index="index" collection="ids" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<select id="existCodeVersion" resultType="java.lang.Boolean">
+		SELECT COUNT(1) FROM t_bi_datamodel
+		<where>
+			AND upper(FCODE) = upper(#{code})
+			<if test="version != null  and version != ''  ">
+				AND upper(FVERSION) = upper(#{version})
+			</if>
+			<if test="version == null or version == ''  ">
+				AND FVERSION IS NULL
+			</if>
+		</where>
+	</select>
+	<select id="existNameVersion" resultType="java.lang.Boolean">
+		SELECT COUNT(1) FROM t_bi_datamodel
+		<where>
+			AND upper(FNAME) = upper(#{name})
+			<if test="version != null  and version != ''  ">
+				AND upper(FVERSION) = upper(#{version})
+			</if>
+			<if test="version == null or version == ''  ">
+				AND FVERSION IS NULL
+			</if>
+		</where>
+	</select>
+	<select id="selectReference" resultMap="DataModelResult">
+		select fid, fcode, fname,
+		fversion, fdata_type, fsrc_ds_id, fds_id,
+		fdm_state, fparameters from t_bi_datamodel
+		<where>
+			<if test="parameters != null and parameters.size > 0 ">
+				and 1=2
+				<foreach item="item" index="index" collection="parameters">
+					or upper(FPARAMETERS) like '%${item}%'
+				</foreach>
+			</if>
+		</where>
+	</select>
+</mapper>
